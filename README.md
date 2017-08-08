@@ -1,13 +1,26 @@
 # ChemDB
-###### ChemDB shall become a free application that can be used by small to medium scale laboratories to keep track of the whereabouts of their chemicals.
-___
+---
+## Features
+- [x] graphical user interface with periodic table as search mask
+- [x] SQLite3 database for efficient storage of compound data
+- [ ] Management of compounds within the gui
+- [ ] additional compound data to boost working efficiency (planning in progress)
+- [x] using a shared database with multiple "clients" (no user accounts)
 
-This is a learning by doing project to help me learn to code. My goal is to write an application in python that lets you transfer your data from a single excel sheet file to an SQLite3 database. The data is meant to be information about the chemicals your lab is using like where they are, what their quantity is etc. Also i want to introduce a *flag system*, where one can set chemicals as *missing* or in use by someone. This is due to the way chemicals are stored and used in the laboratory i work at. If this doesn't make sense to you feel free to contact me.
-___
+## Getting started
+- Install Python 3.X and Git from official sources like [Python.org](https://www.python.org/) or [git-scm.com](https://git-scm.com/download/win)
+- clone into this repository with ``git clone https://github.com/m0n0368291/ChemDB.git``
+- execute ``main.py`` by typing ``python main.py`` into the command-line, after navigating into the folder containing the repository
 
-####Planned Structure
-*check back later*
-___
+## Database Schema
+*coming soon*
 
-#### How to participate
-*no participation possible yet*
+## Notes
+- **There is no release yet! Expect functions to be not working at all!**
+- **at the moment the database is still hardcoded into ``main.py``, so opening a database with the button has no effect!**
+
+## How to contribute
+Contribution is not planned for this project (yet).
+
+## Help
+If you need help with ChemDB contact me via email at christopher_grimm@gmx.de
