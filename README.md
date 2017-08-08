@@ -1,5 +1,5 @@
 # ChemDB
----
+
 ## Features
 - [x] graphical user interface with periodic table as search mask
 - [x] SQLite3 database for efficient storage of compound data
@@ -12,7 +12,10 @@
 - clone into this repository with ``git clone https://github.com/m0n0368291/ChemDB.git``
 - execute ``main.py`` by typing ``python main.py`` into the command-line, after navigating into the folder containing the repository
 
-## Database Schema
+### Database Schema
+*coming soon*
+
+### Migration from Excel to SQLite3
 *coming soon*
 
 ## Notes
