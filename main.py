@@ -5,8 +5,6 @@ from tkinter import *
 from tkinter import filedialog
 import re
 import sqlite3
-# import sys
-# import os
 
 
 def open_database():
