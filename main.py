@@ -9,7 +9,8 @@ import sqlite3
 
 def open_database():
     '''This function will be used to open a database.'''
-    database = filedialog.askopenfile(initialdir='C:/', title='Select Database', filetypes=(("db files", "*.db"), ("all files", "*.*")))
+    database = filedialog.askopenfile(initialdir='C:/', title='Select \
+    Database', filetypes=(("db files", "*.db"), ("all files", "*.*")))
     return(database)
 
 
@@ -18,11 +19,7 @@ def atoms():
     this function defines the maximum number of atoms to choose
     for each element
     '''
-    i = 0
-    number_of_atoms = []
-    while i <= 100:
-        number_of_atoms.append(str(i))
-        i += 1
+    number_of_atoms = [i for i in range(0, 100)]
     return(number_of_atoms)
 
 
@@ -59,8 +56,9 @@ def ElementButton(frame, element, x, y):
     # l = Label()
     w = OptionMenu(frame, variable, *atoms())
     # das * ist notwendig, damit die Funktion funzt
-    w.config(width=2, height=1, borderwidth=1, highlightbackground='ghost white', background='LightSteelBlue2',
-            relief=RIDGE, font=('Arial', 12))
+    w.config(width=2, height=1, borderwidth=1,
+             highlightbackground='ghost white', background='LightSteelBlue2',
+             relief=RIDGE, font=('Arial', 12))
     # relief types: flat, groove, raised, ridge, solid, or sunken
     w.grid(column=x, row=y)
     # print(variable.get())
