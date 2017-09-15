@@ -121,7 +121,8 @@ def search():
         # button needs to be dictionary like and will come from tkinter gui
         # if the value of a button is a digit it will be added to the sql query
         if re.match(pattern, button_list[value].get()):
-            formatted_query = str(formatted_query + ' AND ' + value + '=\'' + str(button_list[value].get())+'\'')
+            formatted_query = str(formatted_query + ' AND ' + value + '=\''
+                                  + str(button_list[value].get())+'\'')
         else:
             pass
     # the first 'AND' needs to be sliced off
