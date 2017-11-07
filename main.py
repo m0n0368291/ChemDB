@@ -6,6 +6,79 @@ from tkinter import filedialog
 import re
 import sqlite3
 
+# Windows and frames layout
+window = Tk()
+window.title('ChemDB')
+window.minsize(500, 300)
+window.config(bg='ghost white')
+
+searchframe = Frame(window)
+searchframe.grid(column=0, row=0, sticky="nsew")
+searchframe.config(bg='ghost white')
+
+addframe = Frame(window)
+addframe.config(bg="DeepSkyBlue2")
+addframe.grid(column=0, row=0, sticky="nsew")
+
+
+class Client():
+
+    def __init__(self):
+        pass
+        # self.results = None
+
+    def search(self):
+        ''' This function takes all numerical element button values and submits
+        an SQL query to the database.
+        '''
+        pattern = r"[1-9]+"  # regex for one or more digits
+        formatted_values = ("id, Name, lab, in_use_by, missing")
+        # enter column names for values to be selected by SQL
+        formatted_query = str('')
+        for value in button_list:
+            # button needs to be dictionary like and will come from tkinter gui
+            # if the value of a button is a digit it will be added to the sql query
+            if re.match(pattern, button_list[value].get()):
+                formatted_query = str(formatted_query + ' AND ' + value + '=\''
+                                      + str(button_list[value].get())+'\'')
+            else:
+                pass
+        # the first 'AND' needs to be sliced off
+        formatted_query = formatted_query[5:]
+        print(formatted_query)
+        # execution of SQL query___________________________________________
+        connection = sqlite3.connect("Chemikalienliste.db")
+        cursor = connection.cursor()
+        query = r'''SELECT * FROM 'Chemikalien' WHERE {0};
+        '''.format(formatted_query)
+        print(query)
+        cursor.execute(query)  # Befehl ausführen
+        self.results = cursor.fetchall()
+        connection.commit()  # Befehl abschicken
+        # Listbox containing query results
+        w = Listbox(window, selectmode=SINGLE)
+        w.grid(row=10, columnspan=28)  # position on window grid
+        w.config(width=135, font=('TkFixedFont'))
+        # print('results window:',results)
+        w.insert(END, "{:^80}|{:^10}|{:^6}|{:^6}|{:^10}|{:^10}".format('Name', 'Lab', 'g', 'ml', 'in use by', 'missing'))
+        try:
+            for entry in self.results:
+                if entry[-2] == 'None':
+                    nutzung = '-'
+                else:
+                    nutzung = entry[24]
+                if entry[-3] == 'FALSCH':
+                    vermisst = '-'
+                else:
+                    vermisst = '+'
+                w.insert(END, "{:80}|{:^10}|{:^6}|{:^6}|{:^10}|{:^10}".format(entry[1], entry[-4], entry[3], entry[4], nutzung, vermisst))
+        except:
+            pass
+        return(self.results)
+
+    def add(self):
+        pass
+
 
 def open_database():
     '''This function will be used to open a database.'''
@@ -46,6 +119,8 @@ element_list = [
                 ]
 
 
+# make a class of periodictable() and Elementbutton()?
+
 def ElementButton(frame, element, x, y):
     '''
     This function defines the buttons. Every element has its own button.
@@ -84,6 +159,7 @@ def periodictable(frame):
             x += 1
     return(button_list)
 
+session = Client()
 
 def OpenButton(frame):
     w = Button(frame, text='Open \n Database', command=open_database)
@@ -92,7 +168,7 @@ def OpenButton(frame):
 
 
 def SearchButton(frame):
-    w = Button(frame, text='Search', command=search)
+    w = Button(frame, text='Search', command=session.search)
     w.grid(column=8, row=11, columnspan=2)
     w.config(width=12, height=2)
 
@@ -109,96 +185,25 @@ def BackButton(frame):
     w.config(width=12, height=2)
 
 
-def search():
-    ''' This function takes all numerical element button values and submits
-    an SQL query to the database.
-    '''
-    pattern = r"[1-9]+"  # regex for one or more digits
-    formatted_values = ("id, Name, lab, in_use_by, missing")
-    # enter column names for values to be selected by SQL
-    formatted_query = str('')
-    for value in button_list:
-        # button needs to be dictionary like and will come from tkinter gui
-        # if the value of a button is a digit it will be added to the sql query
-        if re.match(pattern, button_list[value].get()):
-            formatted_query = str(formatted_query + ' AND ' + value + '=\''
-                                  + str(button_list[value].get())+'\'')
-        else:
-            pass
-    # the first 'AND' needs to be sliced off
-    formatted_query = formatted_query[5:]
-    print(formatted_query)
-    # execution of SQL query___________________________________________
-    connection = sqlite3.connect("Chemikalienliste.db")
-    cursor = connection.cursor()
-    query = r'''SELECT * FROM 'Chemikalien' WHERE {0};
-    '''.format(formatted_query)
-    print(query)
-    cursor.execute(query)  # Befehl ausführen
-    results = cursor.fetchall()
-    connection.commit()  # Befehl abschicken
-    # Listbox containing query results
-    w = Listbox(window, selectmode=SINGLE)
-    w.grid(row=10, columnspan=28)  # position on window grid
-    w.config(width=135, font=('TkFixedFont'))
-    # print('results window:',results)
-    w.insert(END, "{:^80}|{:^10}|{:^6}|{:^6}|{:^10}|{:^10}".format('Name', 'Lab', 'g', 'ml', 'in use by', 'missing'))
-    try:
-        for entry in results:
-            if entry[-2] == 'None':
-                nutzung = '-'
-            else:
-                nutzung = entry[24]
-            if entry[-3] == 'FALSCH':
-                vermisst = '-'
-            else:
-                vermisst = '+'
-            w.insert(END, "{:80}|{:^10}|{:^6}|{:^6}|{:^10}|{:^10}".format(entry[1], entry[-4], entry[3], entry[4], nutzung, vermisst))
-    except:
-        pass
-    return(results)
-
-
-def add_compound():
-    pass
-
-
 def add():
     addframe.tkraise()
+    print(session.results)
 
 
 def back():
     searchframe.tkraise()
 
 
-# GENERAL WORKFLOW
-
-# general window details
-# window is where all Frames go
-window = Tk()
-window.title('ChemDB')
-window.minsize(500, 300)
-window.config(bg='ghost white')
-
-
-# FRAME LAYOUTS
-searchframe = Frame(window)
-searchframe.grid(column=0, row=0, sticky="nsew")
-searchframe.config(bg='ghost white')
+# Widgets for all frames
 SearchButton(searchframe)
 AddButton(searchframe)
 button_list = periodictable(searchframe)
 OpenButton(searchframe)
 
-
-addframe = Frame(window)
-addframe.config(bg="DeepSkyBlue2")
-addframe.grid(column=0, row=0, sticky="nsew")
 BackButton(addframe)
 button_list_add = periodictable(addframe)
 
 
+
 searchframe.tkraise()  # make searchframe the first to be seen
-
-
 window.mainloop()
