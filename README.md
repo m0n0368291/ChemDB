@@ -1,5 +1,5 @@
 # ChemDB
-
+![gui beta preview](https://github.com/m0n0368291/ChemDB/blob/master/beta.bmp "GUI Preview")
 ## Features
 - [x] graphical user interface with periodic table as search mask
 - [x] SQLite3 database for efficient storage of compound data
