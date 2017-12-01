@@ -1,129 +1,67 @@
 # -*- coding: utf-8 -*-
-# !C:/Program Files (x86)/Python 2.7/python.exe
+# !C:\ProgramData\Anaconda3\python.exe
 
-import csv  # comma separated value
-import sqlite3  # sqlite3 database support
+import csv
+import sqlite3
+
+GHS_dictionary = {
+    'T' : 'GHS06'
+    'T+' : 'GHS06'
+    'Xn' : 'GHS08'
+    'Xi' : 'GHS07'
+    'F' : 'GHS02'
+    'F+' : 'GHS02'
+    'E' : 'GHS01'
+    'C' : 'GHS05'
+    'N' : 'GHS09'
+    'O' : 'GHS03'
+    'kA' : 'no_hazard'
+                    }
 
 
-def create_database():
-    connection = sqlite3.connect("Chemikalienliste.db")
-    cursor = connection.cursor()
+def db2():
+    '''
+    this function creates a database schema using the GHS system for safety
+    hazard declaration. Arsenic and Indium need to be called by their full names,
+    to escape SQL syntax.
+    '''
+    element_list = [
+                    'H', 'He',
+                    'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
+                    'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',
+                    'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'Arsenic', 'Se', 'Br', 'Kr',
+                    'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'Indium', 'Sn', 'Sb', 'Te', 'I', 'Xe',
+                    'Cs', 'Ba', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn',
+                    'Fr', 'Ra', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt',
+                    'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu',
+                    'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr',
+                    'C13', 'D'
+                    ]
+
+    chemical_properties_list = [
+                                'no_hazard', 'GHS01', 'GHS02', 'GHS03', 'GHS05', 'GHS06', 'GHS07', 'GHS08', 'GHS09',
+                                'lab', 'missing', 'in_use_by', 'almost_empty'
+                                ]
+
+    sql_list1 = ['{0} INTEGER DEFAULT 0,'.format(i) for i in element_list]
+    # list containing all elements in SQL syntax
+    sql_list2 = ['{0} TEXT DEFAULT False,'.format(i) for i in chemical_properties_list]
+    # list containing all chemical properties in SQL syntax
     db_format = r"""
-    CREATE TABLE "Chemikalien" (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT(300),
-    MW INTEGER DEFAULT 0,
-    Masse INTEGER DEFAULT 0,
-    Vol INTEGER DEFAULT 0,
-    H INTEGER DEFAULT 0,
-    He INTEGER DEFAULT 0,
-    Li INTEGER DEFAULT 0,
-    Be INTEGER DEFAULT 0,
-    B INTEGER DEFAULT 0,
-    C INTEGER DEFAULT 0,
-    N INTEGER DEFAULT 0,
-    O INTEGER DEFAULT 0,
-    F INTEGER DEFAULT 0,
-    Ne INTEGER DEFAULT 0,
-    Na INTEGER DEFAULT 0,
-    Mg INTEGER DEFAULT 0,
-    Al INTEGER DEFAULT 0,
-    Si INTEGER DEFAULT 0,
-    P INTEGER DEFAULT 0,
-    S INTEGER DEFAULT 0,
-    Cl INTEGER DEFAULT 0,
-    Ar INTEGER DEFAULT 0,
-    K INTEGER DEFAULT 0,
-    Ca INTEGER DEFAULT 0,
-    Sc INTEGER DEFAULT 0,
-    Ti INTEGER DEFAULT 0,
-    V INTEGER DEFAULT 0,
-    Cr INTEGER DEFAULT 0,
-    Mn INTEGER DEFAULT 0,
-    Fe INTEGER DEFAULT 0,
-    Co INTEGER DEFAULT 0,
-    Ni INTEGER DEFAULT 0,
-    Cu INTEGER DEFAULT 0,
-    Zn INTEGER DEFAULT 0,
-    Ga INTEGER DEFAULT 0,
-    Ge INTEGER DEFAULT 0,
-    'As' INTEGER DEFAULT 0,
-    Se INTEGER DEFAULT 0,
-    Br INTEGER DEFAULT 0,
-    Kr INTEGER DEFAULT 0,
-    Rb INTEGER DEFAULT 0,
-    Sr INTEGER DEFAULT 0,
-    Y INTEGER DEFAULT 0,
-    Zr INTEGER DEFAULT 0,
-    Nb INTEGER DEFAULT 0,
-    Mo INTEGER DEFAULT 0,
-    Tc INTEGER DEFAULT 0,
-    Ru INTEGER DEFAULT 0,
-    Rh INTEGER DEFAULT 0,
-    Pd INTEGER DEFAULT 0,
-    Ag INTEGER DEFAULT 0,
-    Cd INTEGER DEFAULT 0,
-    'In' INTEGER DEFAULT 0,
-    Sn INTEGER DEFAULT 0,
-    Sb INTEGER DEFAULT 0,
-    Te INTEGER DEFAULT 0,
-    I INTEGER DEFAULT 0,
-    Xe INTEGER DEFAULT 0,
-    Cs INTEGER DEFAULT 0,
-    Ba INTEGER DEFAULT 0,
-    La INTEGER DEFAULT 0,
-    Hf INTEGER DEFAULT 0,
-    Ta INTEGER DEFAULT 0,
-    W INTEGER DEFAULT 0,
-    Re INTEGER DEFAULT 0,
-    Os INTEGER DEFAULT 0,
-    Ir INTEGER DEFAULT 0,
-    Pt INTEGER DEFAULT 0,
-    Au INTEGER DEFAULT 0,
-    Hg INTEGER DEFAULT 0,
-    Tl INTEGER DEFAULT 0,
-    Pb INTEGER DEFAULT 0,
-    Bi INTEGER DEFAULT 0,
-    Po INTEGER DEFAULT 0,
-    At INTEGER DEFAULT 0,
-    Rn INTEGER DEFAULT 0,
-    Ce INTEGER DEFAULT 0,
-    Pr INTEGER DEFAULT 0,
-    Nd INTEGER DEFAULT 0,
-    Pm INTEGER DEFAULT 0,
-    Sm INTEGER DEFAULT 0,
-    Eu INTEGER DEFAULT 0,
-    Gd INTEGER DEFAULT 0,
-    Tb INTEGER DEFAULT 0,
-    Dy INTEGER DEFAULT 0,
-    Ho INTEGER DEFAULT 0,
-    Er INTEGER DEFAULT 0,
-    Tm INTEGER DEFAULT 0,
-    Yb INTEGER DEFAULT 0,
-    Lu INTEGER DEFAULT 0,
-    'no_hazard' TEXT DEFAULT FALSCH,
-    'explosive' TEXT DEFAULT FALSCH,
-    'oxidizing' TEXT DEFAULT FALSCH,
-    'corrosive' TEXT DEFAULT FALSCH,
-    'toxic' TEXT DEFAULT FALSCH,
-    'toxic+' TEXT DEFAULT FALSCH,
-    'flammable' TEXT DEFAULT FALSCH,
-    'flammable+' TEXT DEFAULT FALSCH,
-    'irritant' TEXT DEFAULT FALSCH,
-    'carcinogen' TEXT DEFAULT FALSCH,
-    'environment_hazard' TEXT DEFAULT FALSCH,
-    '13C' INTEGER DEFAULT FALSCH,
-    'D' INTEGER DEFAULT FALSCH,
-    'lab' TEXT,
-    'missing' TEXT DEFAULT FALSCH,
-    'in_use_by' TEXT DEFAULT None,
-    'almost_empty' TEXT DEFAULT FALSCH);
-    """
+    CREATE TABLE "Chemikalien" (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                Name TEXT(300),"""
+    for i in sql_list1:
+        db_format += i.strip("'")
+    for i in sql_list2:
+        db_format += i.strip("'")
+    #print(db_format[:-1]+');')
+    connection = sqlite3.connect("Chem.db")
+    cursor = connection.cursor()
     cursor.execute(r'PRAGMA encoding = "UTF-8";')
     connection.commit()
-    cursor.execute(db_format)  # Befehl ausführen
-    connection.commit()  # Befehl abschicken
-    connection.close()  # Verbindung schließen
+    cursor.execute(db_format[:-1]+');')
+    connection.commit()
+    connection.close()
 
 
 def porter():
@@ -191,5 +129,5 @@ def porter():
     connection.close()  # Verbindung schließen
 
 
-create_database()
-porter()
+db2()
+# porter()

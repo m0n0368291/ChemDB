@@ -27,21 +27,23 @@ def config():
     'main.py'. If found, uses assigned database location in Client.search()
     method. Otherwise a new config is created. Also an "unknown" user is
     registered. Manually entering user credentials might become necessary at a
-    later development stage.
+    later development stage. Also the format of the config file is pretty dumb,
+    but i have no elegant way of parsing it yet.
     '''
     try:
         print('trying to open existing chemdb.config')
         with open('chemdb.config', 'r+') as configfile:
-            database = configfile.readline().split()
-            database = database[2].strip('"')
-            return(database)
+            database = configfile.readline().split(";")
+            database = database[1].strip('"')
+            print('using database at:',database[1:])
+            return(database[1:])
     except FileNotFoundError:
         print('File not found! Opening new database.')
         database = filedialog.askopenfile(initialdir='C:/', title='Select \
                                           Database', filetypes=(("db files",
                                           "*.db"), ("all files", "*.*")))
         with open('chemdb.config', 'w') as configfile:
-            configuration = 'database : '+ database.name + '\nuser : unknown'
+            configuration = 'database ; '+ database.name + ';\nuser ; unknown;'
             configfile.write(configuration)
             print('new chemdb.config created!')
         return(database.name)
@@ -123,7 +125,7 @@ def ElementEntry(frame, element, x, y):
     '''
     variable = StringVar(window)
     variable.set(element)  # default value, substitutes 'zero'
-    e = Entry(frame, textvariable=variable, width=3, justify=CENTER)
+    e = Entry(frame, textvariable=variable, width=9, justify=CENTER)
     e.grid(column=x, row=y)
     e.delete(0,END)
     return(variable)
