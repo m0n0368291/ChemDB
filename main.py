@@ -144,9 +144,7 @@ def periodictable(frame):
     # elements and atoms
     button_list = {}  # this needs to become a dictionary to get the element
     # symbol for the button value!
-    x = 1
-    y = 1
-    i = 0
+    x,y,i = 1,1,0
     for a in element_list:
         if a != 'XX':
             element_label = Label(frame, text=a)
@@ -171,6 +169,27 @@ def BackButton(frame):
     w = Button(frame, text='Back', command=back)
     w.grid(column=2, row=20, columnspan=2)
     #w.config(width=12, height=2)
+
+
+def CommitButton(frame):
+    w = Button(frame, text='Add to\n Database', command=Commit)
+    w.grid(column=14, row=20, columnspan=3, rowspan=3)
+
+
+def Commit():
+    columns = []
+    values = []
+    for value in button_list_add:
+        if not button_list_add[value].get() == '':
+            columns.append(value)
+            print('Column: ', value)
+            values.append(button_list_add[value].get())
+            print('Value: ', button_list_add[value].get())
+    columns = "'" + "', '".join(columns) + "'"
+    values = "'" + "', '".join(values) + "'"
+    commit = r"INSERT INTO 'Chemikalien' ({0}) VALUES ({1});".format(columns, values)
+    print(commit)
+    return(commit)
 
 
 def add():
@@ -207,11 +226,9 @@ AddButton(searchframe)
 
 BackButton(addframe)
 button_list_add = periodictable(addframe)  # dictionary with button elements and values
-
-
+CommitButton(addframe)
 
 searchframe.tkraise()  # make searchframe the first to be seen
-
 
 
 window.mainloop()
