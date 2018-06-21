@@ -51,12 +51,12 @@ def config():
 
 class Client():
 
-    def __init__(self):
-        pass
+    def __init__(self, query=None, results=None):
+        self.results = results
+        self.query = query
 
     def search(self):
-        ''' This function takes all numerical element button values and submits
-        an SQL query to the database.
+        ''' Creates an SQL query as a string
         '''
         formatted_values = ("id, Name, lab, in_use_by, missing")
         formatted_query = str('')
@@ -68,16 +68,25 @@ class Client():
                                       + str(button_list[value].get())+'\'')
         # the first 'AND' needs to be sliced off
         formatted_query = formatted_query[5:]
-        # execution of SQL query___________________________________________
+        self.query = r"SELECT * FROM 'Chemikalien' WHERE {0};".format(formatted_query)
+        print(self.query)
+        return(self.query)
+
+
+    def execute_query(self):
+        ''' Takes an SQL query as a string and commits it to the database
+        '''
         connection = sqlite3.connect(database.get())
         cursor = connection.cursor()
-        query = r'''SELECT * FROM 'Chemikalien' WHERE {0};
-        '''.format(formatted_query)
-        print(query)
-        cursor.execute(query)  # Befehl ausführen
+        print(self.query)
+        cursor.execute(self.query)  # Befehl ausführen klappt nicht!!!! query is Object, not string
         self.results = cursor.fetchall()
-        entries = StringVar(value=self.results)
         connection.commit()  # Befehl abschicken
+        print(self.results)
+        return(self.results)
+
+    def listbox(self):
+        entries = StringVar(value=self.results)
         # Listbox containing query results
         lbox = Listbox(window, selectmode=SINGLE)
         lbox.grid(row=10, columnspan=28)  # position on window grid
@@ -96,7 +105,6 @@ class Client():
                 lbox.insert(END, "{:80}|{:^10}|{:^6}|{:^6}|{:^10}|{:^10}".format(entry[1], entry[-4], entry[3], entry[4], nutzung, vermisst))
         except:
             pass
-        return(self.results)
 
 
     def add(self):
@@ -153,15 +161,6 @@ def periodictable(frame):
     return(button_list)
 
 
-session = Client()
-
-
-def SearchButton(frame):
-    w = Button(frame, text='Search', command=session.search)
-    w.grid(column=7, row=20, columnspan=3)
-    #w.config(width=12, height=2)
-
-
 def AddButton(frame):
     w = Button(frame, text='Add \nCompound', command=add)
     w.grid(column=10, row=20, columnspan=3, rowspan=3)
@@ -182,18 +181,36 @@ def back():
     searchframe.tkraise()
 
 
+session = Client()
+
+button_list = periodictable(searchframe)  # dictionary with button elements and values
+
+database = StringVar()  # database location variable for search method of session class
+database.set(config())  # look for config file and create one if necessary
+
+def full_search():
+    session.search()
+    session.execute_query()
+    session.listbox()
+
+def SearchButton(frame):
+    w = Button(frame, text='Search', command=full_search)
+    w.grid(column=7, row=20, columnspan=3)
+    #w.config(width=12, height=2)
+
+
 # Widgets for all frames
 SearchButton(searchframe)
 AddButton(searchframe)
-button_list = periodictable(searchframe)  # dictionary with button elements and values
+
 #OpenButton(searchframe)
 
 BackButton(addframe)
 button_list_add = periodictable(addframe)  # dictionary with button elements and values
 
+
+
 searchframe.tkraise()  # make searchframe the first to be seen
-database = StringVar()  # database location variable for search method of session class
-database.set(config())  # look for config file and create one if necessary
 
 
 
