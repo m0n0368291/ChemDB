@@ -64,7 +64,7 @@ class Client():
             # button needs to be dictionary like and will come from tkinter gui
             # if the value of a button is a digit between 1-100 it will be added to the sql query
             if not button_list[value].get() == '':
-                formatted_query = str(formatted_query + ' AND ' + value + '=\''
+                formatted_query = str(formatted_query + ' AND \"' + value + '\"=\''
                                       + str(button_list[value].get())+'\'')
         # the first 'AND' needs to be sliced off
         formatted_query = formatted_query[5:]
@@ -79,7 +79,7 @@ class Client():
         connection = sqlite3.connect(database.get())
         cursor = connection.cursor()
         print(self.query)
-        cursor.execute(self.query)  # Befehl ausführen klappt nicht!!!! query is Object, not string
+        cursor.execute(self.query)
         self.results = cursor.fetchall()
         connection.commit()  # Befehl abschicken
         print(self.results)
@@ -112,7 +112,6 @@ class Client():
 
 
 # 'XX' entries yield empty spaces in periodic table
-# Indium and Arsenic still messing up the query!!!
 element_list = [
                 'H', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'He',
                 'Li', 'Be', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'XX', 'B', 'C', 'N', 'O', 'F', 'Ne',
@@ -125,6 +124,16 @@ element_list = [
                 'XX', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'XX', 'XX', 'XX'
                 ]
 
+def CompoundNameEntry(frame):
+	"""
+	Text entry widget for compound names. Not functional yet.
+	"""
+	compound_name = StringVar()
+	e = Entry(frame, textvariable=compound_name, width=70)
+	e.grid(column=3,row=2, columnspan=8)
+	e.delete(0, END)
+	e.insert(0,"Compound Name")
+	return(compound_name)
 
 def ElementEntry(frame, element, x, y):
     '''
@@ -135,7 +144,7 @@ def ElementEntry(frame, element, x, y):
     variable.set(element)  # default value, substitutes 'zero'
     e = Entry(frame, textvariable=variable, width=9, justify=CENTER)
     e.grid(column=x, row=y)
-    e.delete(0,END)
+    e.delete(0, END)
     return(variable)
 
 
@@ -160,7 +169,7 @@ def periodictable(frame):
 
 
 def AddButton(frame):
-    w = Button(frame, text='Add \nCompound', command=add)
+    w = Button(frame, text='Add \nCompound', command=switch_to_addframe)
     w.grid(column=10, row=20, columnspan=3, rowspan=3)
     #w.config(width=12, height=2)
 
@@ -170,9 +179,15 @@ def BackButton(frame):
     w.grid(column=2, row=20, columnspan=2)
     #w.config(width=12, height=2)
 
+def add_to_database():
+    connection = sqlite3.connect(database.get())
+    cursor = connection.cursor()
+    cursor.execute(Commit())
+    connection.commit()  # Befehl abschicken
+
 
 def CommitButton(frame):
-    w = Button(frame, text='Add to\n Database', command=Commit)
+    w = Button(frame, text='Add to\n Database', command=add_to_database)
     w.grid(column=14, row=20, columnspan=3, rowspan=3)
 
 
@@ -192,7 +207,7 @@ def Commit():
     return(commit)
 
 
-def add():
+def switch_to_addframe():
     addframe.tkraise()
 
 
@@ -221,7 +236,7 @@ def SearchButton(frame):
 # Widgets for all frames
 SearchButton(searchframe)
 AddButton(searchframe)
-
+CompoundNameEntry(searchframe)
 #OpenButton(searchframe)
 
 BackButton(addframe)
